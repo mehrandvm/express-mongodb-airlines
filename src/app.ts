@@ -5,7 +5,8 @@ import { logger } from './utils/logger';
 import { cpus } from 'os';
 //import controllers
 import { healthcheck } from './controllers/controller-healthcheck';
-import { getTime, sampleTransaction } from './controllers/controller-sample';
+import { getUser, sampleTransaction } from './controllers/controller-user';
+import cors from 'cors';
 
 const numCPUs = cpus().length;
 
@@ -29,15 +30,16 @@ if (cluster.isPrimary) {
     const app: express.Express = express();
     const router: express.Router = express.Router();
 
+    app.use(cors({credentials: true, origin: true}))
     app.use(express.json());
     app.use(router); // tell the app this is the router we are using
 
     //healthcheck routes
     router.get('/', healthcheck);
-    router.get('/healthcheck', healthcheck);
+    router.get('/user', getUser);
     // sampleController routes
-    router.get('/servertime', getTime);
-    router.get('/transaction', sampleTransaction);
+    // router.get('/servertime', getTime);
+    router.post('/user', sampleTransaction);
 
     app.listen(config.port, function () {
         const workerId =

@@ -1,18 +1,13 @@
 import { Request, Response } from 'express';
-import { logger } from './../utils/logger';
-import { getTimeModel, sampleTransactionModel } from './../models/model-sample';
+import { logger } from '../utils/logger';
+import { createUser } from '../models/model-user';
 import { QueryResult } from 'pg';
+import { getUserModel } from '../models/model-user';
 
-/**
- * sample controller
- * @param { Request } req
- * @param { Response } res
- * @returns { Promise<void> }
- */
-export const getTime = async (req: Request, res: Response): Promise<void> => {
+export const getUser = async (req: Request, res: Response): Promise<void> => {
     let result: QueryResult;
     try {
-        result = await getTimeModel();
+        result = await getUserModel();        
         res.status(200).json({
             status: 'ok',
             message: result.rows,
@@ -40,7 +35,7 @@ export const sampleTransaction = async (
 ): Promise<void> => {
     let result: string;
     try {
-        result = await sampleTransactionModel();
+        result = await createUser(req.body);
         res.status(200).json({
             status: 'ok',
             message: result,
