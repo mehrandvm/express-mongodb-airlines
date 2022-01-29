@@ -32,6 +32,8 @@ app.use(router); // tell the app this is the router we are using
 
 router.get("/", healthcheck);
 
+// ------------- Arrivals ---------------
+
 router.get("/arrivals", function (req, res) {
   const filter: Flight = {}
   if (req.body.time) filter.actualtime = req.body.time
@@ -95,5 +97,73 @@ router.get("/arrivals/seed", async function (req, res) {
   const data = await getDataFromAPI()
   db?.collection("arrivals").insertMany(data.arrivals, function () {
     res.send("Successfully added arrivals!");
+  });
+});
+
+// ------------- Departures ---------------
+
+router.get("/departures", function (req, res) {
+  const filter: Flight = {}
+  if (req.body.time) filter.actualtime = req.body.time
+  if (req.body.city) filter.city = req.body.city
+  if (req.body.airline) filter.airline = req.body.airline
+  if (req.body.id) filter._id = new ObjectId(req.body.id)
+  db?.collection("departures")
+    .find(filter)
+    .toArray(function (err, items) {
+      res.send(items);
+    });
+});
+
+router.post("/departures", function (req, res) {
+  const filter: Flight = {}
+  if (req.body.time) filter.actualtime = req.body.time
+  if (req.body.city) filter.city = req.body.city
+  if (req.body.airline) filter.airline = req.body.airline
+  if (req.body.id) filter._id = new ObjectId(req.body.id)
+  db?.collection("departures").insertOne(
+    filter,
+    function () {
+      res.send("Successfully inserted!");
+    }
+  );
+});
+
+router.put("/departures/:id", function (req, res) {
+  const id = new ObjectId(req.params.id);
+  const filter: Flight = {}
+  if (req.body.time) filter.actualtime = req.body.time
+  if (req.body.city) filter.city = req.body.city
+  if (req.body.airline) filter.airline = req.body.airline
+  db?.collection("departures").findOneAndUpdate(
+    { _id: id },
+    { $set: filter },
+    function () {
+      res.send("Successfully updated!");
+    }
+  );
+});
+
+router.delete("/departures", function (req, res) {
+  const filter: Flight = {}
+  if (req.body.time) filter.actualtime = req.body.time
+  if (req.body.city) filter.city = req.body.city
+  if (req.body.airline) filter.airline = req.body.airline
+  if (req.body.id) filter._id = new ObjectId(req.body.id)
+  db?.collection("departures").deleteOne(filter, function () {
+    res.send("Successfully deleted!");
+  });
+});
+
+router.delete("/departures/all", function (req, res) {
+  db?.collection("departures").deleteMany({}, function () {
+    res.send("Successfully deleted departures!");
+  });
+});
+
+router.get("/departures/seed", async function (req, res) {
+  const data = await getDataFromAPI()
+  db?.collection("departures").insertMany(data.departures, function () {
+    res.send("Successfully added departures!");
   });
 });
